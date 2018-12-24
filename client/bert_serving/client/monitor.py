@@ -6,13 +6,12 @@ from bert_serving.client import BertClient
 ip = 'localhost'
 port = 4000
 port_out = 4001
+bc = BertClient(port=port, port_out=port_out, check_version=True, show_server_config=True)
 
 
-class BertMonitor(BaseHTTPRequestHandler, BertClient):
-
+class BertMonitor(BaseHTTPRequestHandler):
     def __init__(self, request, client_address, server):
         super().__init__(request, client_address, server)
-        self.bc = BertClient(port=4000, port_out=4001, check_version=True, show_server_config=True)
 
     def _set_headers(self):
         self.send_response(200)
@@ -24,7 +23,7 @@ class BertMonitor(BaseHTTPRequestHandler, BertClient):
 
     def do_GET(self):
         self._set_headers()
-        self.wfile.write(json.dumps(self.bc.server_status))
+        self.wfile.write(json.dumps(bc.server_status, ensure_ascii=False).encode('utf-8'))
 
 
 def run(server_class=HTTPServer, handler_class=BertMonitor, port=8531):
